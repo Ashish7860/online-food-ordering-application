@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  mysql-db:
+    image: mysql:8
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: restaurant
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - online-food-ordering-network
+    restart: always  
+
+  online-food-ordering-system-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: online-food-ordering-system
+    depends_on:
+      - mysql-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/restaurant
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8081:8081"
+    networks:
+      - online-food-ordering-network
+    restart: always  
+
+volumes:
+  mysql-data:
+
+networks:
+  online-food-ordering-network:
+    driver: bridge
